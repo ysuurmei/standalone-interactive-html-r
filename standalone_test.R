@@ -15,6 +15,7 @@
 library(htmltools)
 library(crosstalk)
 library(d3scatter)
+library(leaflet)
 
 
 #Step 2: Define shared data object:
@@ -33,19 +34,25 @@ shared_mtcars <- SharedData$new(mtcars)
 css_test <- ".css_text    {color: blue;}
              p            {color: red;}"
 
+map_example <- leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=174.768, lat=-36.852, popup="The birthplace of R")
+
 test <- bscols(widths = c(3,NA,NA), #3 columns, one with defined with, the others are flexible
        list( #filling the first column, use list for multiple items below each other
          filter_checkbox("cyl", "Cylinders", shared_mtcars, ~cyl, inline = TRUE), #checkbox example (notice you use the shared data in the element definition!)
          filter_slider("hp", "Horsepower", shared_mtcars, ~hp, width = "100%"), #slider example
          filter_select("auto", "Automatic", shared_mtcars, ~ifelse(am == 0, "Yes", "No")), #select/dropdown example
-          HTML("<h1> Just some example text </h1>"), #Using the html tools package you can also format any text using standard html markup
-          HTML("Some unformatted text"),
-          HTML("<b>huh whut, wow, you can do anything to this text!!!</b>"),
-         HTML("<h2 class = css_text> With a little creativity, you can even apply CSS</h2>"),
+         HTML("Some unformatted text"), 
+         HTML("<h1> H1 Headers also work </h1>"), #Using the html tools package you can also format any text using standard html markup
+          HTML("<b>bold text</b>"),
+         HTML("<h2 class = css_text> application of CSS styling</h2>"),
           HTML(paste("<style>",css_test,"</style>")) #Include your CSS style sheets in the interface
          ),
        d3scatter(shared_mtcars, ~wt, ~mpg, ~factor(cyl), width="100%", height=250), #scatter plots both as seperate columns
-       d3scatter(shared_mtcars, ~hp, ~qsec, ~factor(cyl), width="100%", height=250)
+       list(d3scatter(shared_mtcars, ~hp, ~qsec, ~factor(cyl), width="100%", height=250),
+            map_example
+            )
 )
 
 #Step 4: Test & export
